@@ -1,41 +1,394 @@
-import React,{useEffect,useState} from 'react';
-import{createRoot}from'react-dom/client';
-import{ArrowRight,Play,Pause,MousePointer2,ShieldCheck,Upload,Menu,X,Box,RotateCcw,Eye}from'lucide-react';
-import'./styles.css';
+import React, { useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right.mjs';
+import ArrowUpRight from 'lucide-react/dist/esm/icons/arrow-up-right.mjs';
+import BookOpen from 'lucide-react/dist/esm/icons/book-open.mjs';
+import Menu from 'lucide-react/dist/esm/icons/menu.mjs';
+import X from 'lucide-react/dist/esm/icons/x.mjs';
+import './styles.css';
 
-const steps=[['01','Design','Author keyframes with intent and timing.'],['02','Validate','Catch infeasible motion early with real-time checks.'],['03','Retarget','Map motion to any capable robot in one click.'],['04','Deploy','Export clean trajectories for sim and hardware.']];
-const features=[['pointer','Direct manipulation','Move keyframes in 3D or on the timeline. See results instantly.'],['shield','Constraint-aware authoring','Real-time joint limits, self-collision, and contact feedback.'],['upload','Clean trajectory export','Export time-parameterized motion ready for your stack.']];
-const Icon=({type})=>type==='pointer'?<MousePointer2/>:type==='shield'?<ShieldCheck/>:<Upload/>;
+import logoUrl from '../assets/ghostlogo.png';
+import interfaceUrl from '../assets/ghostgui-interface.png';
+import keyframesUrl from '../assets/keyframes.png';
+import pipelineUrl from '../assets/motiongen-pipeline.png';
+import demoUrl from '../assets/hand-motion-design.mp4';
 
-function Mark(){return <span className="mark"><i></i><i></i></span>}
-function Robot({ghost=false,shift=0}){return <g className={ghost?'ghost robot':'robot'} transform={`translate(${shift} 0)`}>
- <circle cx="182" cy="77" r="18"/><path d="M174 94 L155 149 L183 177 L206 137 L197 95Z"/>
- <path d="M159 110 L118 135 L87 115"/><path d="M199 109 L235 91 L268 106"/>
- <path d="M181 175 L146 218 L119 266"/><path d="M190 175 L220 217 L258 249"/>
- <circle cx="158" cy="109" r="8"/><circle cx="119" cy="135" r="8"/><circle cx="88" cy="115" r="8"/>
- <circle cx="199" cy="109" r="8"/><circle cx="235" cy="91" r="8"/><circle cx="268" cy="106" r="8"/>
- <circle cx="181" cy="175" r="9"/><circle cx="146" cy="218" r="9"/><circle cx="119" cy="266" r="9"/>
- <circle cx="190" cy="175" r="9"/><circle cx="220" cy="217" r="9"/><circle cx="258" cy="249" r="9"/>
- </g>}
-function RobotStage({progress=42}){return <svg className="robot-stage" viewBox="0 0 360 310" aria-label="Humanoid robot motion preview">
- <defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#dce1eb" strokeWidth=".7"/></pattern></defs>
- <rect width="360" height="310" fill="url(#grid)"/><path className="trajectory" d="M55 255 C100 245 108 190 153 226 S215 255 270 190"/>
- <g opacity=".12"><Robot ghost shift={-42}/></g><g opacity=".24"><Robot ghost shift={-20}/></g><Robot shift={progress/6}/>
- <g className="axis" transform="translate(28 270)"><path d="M0 0h24M0 0v-24M0 0l-12 9"/><text x="27">X</text><text y="-28">Z</text></g>
- </svg>}
-function Editor(){const[playing,setPlaying]=useState(false);const[p,setP]=useState(42);useEffect(()=>{if(!playing)return;const id=setInterval(()=>setP(v=>v>=100?0:v+1),55);return()=>clearInterval(id)},[playing]);return <div className="editor">
- <div className="editor-top"><span>Stand to reach — v03</span><button onClick={()=>setPlaying(!playing)} aria-label={playing?'Pause':'Play'}>{playing?<Pause/>:<Play/>}</button><span className="mono">00:0{Math.floor(p/20)}.{String(p%20).padStart(2,'0')}</span></div>
- <div className="editor-body"><aside><b>SCENE</b><span className="selected"><Box/> G1 Robot</span><span><Eye/> Ground</span><span><Eye/> Camera</span></aside><RobotStage progress={p}/><div className="inspector"><b>INSPECTOR</b><label>RIGHT HIP <em>-18.6°</em></label><input type="range" value={p} onChange={e=>setP(+e.target.value)}/><label>RIGHT KNEE <em>62.1°</em></label><input type="range" value={70-p/4} readOnly/><label>CONSTRAINTS</label><small>Self-collision <i>✓ OK</i></small><small>Joint limits <i>✓ OK</i></small><small>Ground contact <i>✓ OK</i></small></div></div>
- <div className="timeline"><b>KEYFRAMES</b><input aria-label="Timeline" type="range" value={p} onChange={e=>setP(+e.target.value)}/><span>{p}%</span></div></div>}
+const GITHUB_URL = 'https://github.com/yx-lim/ghostgui';
+const DOCS_URL = `${GITHUB_URL}/blob/main/docs/README.md`;
+const INSTALL_URL = `${GITHUB_URL}/blob/main/docs/install.md`;
 
-function App(){const[menu,setMenu]=useState(false);const[active,setActive]=useState(0);return <>
- <header><a className="brand" href="#"><Mark/>Ghost</a><nav className={menu?'open':''}>{['Product','Workflow','Research','Docs'].map(x=><a key={x} href={`#${x.toLowerCase()}`} onClick={()=>setMenu(false)}>{x}</a>)}</nav><a className="top-cta" href="#product">Start designing <ArrowRight/></a><button className="menu" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></header>
- <main><section className="hero" id="product"><div className="hero-copy"><h1>Motion,<br/>by design.</h1><p>Create expressive, kinematically feasible robot motion—without writing a single trajectory by hand.</p><div className="actions"><a className="primary" href="#workflow">Start designing <ArrowRight/></a><a className="secondary" href="#workflow"><Play/> Watch the workflow</a></div></div><Editor/></section>
- <section className="proof"><h2>Built for motion that has to work in the real world.</h2><div><span><ShieldCheck/>Kinematic validation</span><span><Box/>Model-agnostic workflow</span><span><Upload/>Simulation-ready export</span></div></section>
- <section className="workflow" id="workflow"><h2>From pose to policy.</h2><p className="section-lead">Author keyframes. Catch infeasible motion early. Hand clean references to your dynamics and learning stack.</p><div className="steps">{steps.map((s,i)=><button key={s[0]} className={active===i?'active':''} onClick={()=>setActive(i)}><span><b>{s[0]}</b> {s[1]}</span><div className="mini-robot"><RobotStage progress={i*22+15}/></div><p>{s[2]}</p></button>)}</div><div className="step-status"><b>{steps[active][0]} / 04</b><span>{steps[active][1]}</span><i></i></div></section>
- <section className="control"><div className="curve-editor"><div className="curve-head"><b>KEYFRAMES</b><span>28 keyframes</span></div>{['Root','Spine','Right Arm','Left Arm','Right Leg'].map((x,i)=><div className="track" key={x}><span>{x}</span><svg viewBox="0 0 280 28"><path d={`M0 ${14+i%2*3} C60 ${2+i*3}, 90 ${25-i}, 145 12 S225 ${4+i*2},280 14`}/>{[30,88,145,205,260].map(n=><circle key={n} cx={n} cy={14+(i%2?3:-2)} r="3"/>)}</svg></div>)}</div><div className="feature-copy"><h2>Every frame,<br/>under control.</h2>{features.map(f=><div className="feature" key={f[1]}><Icon type={f[0]}/><div><h3>{f[1]}</h3><p>{f[2]}</p></div></div>)}</div></section>
- <section className="research" id="research"><div><h2>Better references<br/>make better robots.</h2><p>Study how keyframe density and kinematic feasibility affect retargeting, optimization, and tracking.</p><a href="#docs">Explore research <ArrowRight/></a></div><div className="comparison"><article><b>Sparse & infeasible</b><div className="poses"><i></i><i></i><i></i><i></i></div><svg viewBox="0 0 360 100"><path className="orange" d="M0 68 C60 70 45 4 102 48 S175 84 220 24 S292 90 360 40"/></svg></article><span className="vs">VS</span><article><b>Dense & feasible</b><div className="poses dense"><i></i><i></i><i></i><i></i><i></i><i></i></div><svg viewBox="0 0 360 100"><path d="M0 64 C70 60 95 35 150 48 S250 72 360 40"/></svg></article></div></section>
- <section className="final"><h2>Give your robot<br/>a better starting point.</h2><a href="#product">Start designing <ArrowRight/></a></section></main>
- <footer><a className="brand" href="#"><Mark/>Ghost</a><span>Motion design for robots.</span><nav><a href="#product">Product</a><a href="#workflow">Workflow</a><a href="#research">Research</a><a id="docs">Docs</a></nav><small>© 2026 Ghost</small></footer>
- </>}
-createRoot(document.getElementById('root')).render(<App/>);
+const navItems = [
+  ['Features', '#features'],
+  ['Demo', '#demo'],
+  ['Pipeline', '#pipeline'],
+  ['Research', '#research'],
+  ['Install', '#install'],
+];
+
+const features = [
+  {
+    title: 'Direct robot editing',
+    copy: 'Move end-effectors with a 3D transform gizmo or edit joint angles directly.',
+  },
+  {
+    title: 'Preview before committing',
+    copy: 'Inspect intermediate poses and constraint feedback before a keyframe becomes part of the motion.',
+  },
+  {
+    title: 'Motion timeline editing',
+    copy: 'Insert, shift, move, scale, copy, reverse, repeat, and ping-pong.',
+  },
+  {
+    title: 'Built for robotics pipelines',
+    copy: 'Import and export references for simulation, retargeting, and learning workflows.',
+  },
+];
+
+const pipelineStages = [
+  {
+    name: 'GhostGUI',
+    action: 'Create motion',
+    links: [{ label: 'Code', href: GITHUB_URL }],
+  },
+  {
+    name: 'DSMS',
+    action: 'Optimize dynamic feasibility',
+    links: [
+      { label: 'Paper', href: 'https://arxiv.org/abs/2608.03116' },
+      { label: 'Code', href: 'https://github.com/sesteban951/shooting-for-contact' },
+    ],
+  },
+  {
+    name: 'Motion-imitation RL',
+    action: 'Train tracking policy',
+    links: [
+      { label: 'Paper', href: 'https://arxiv.org/abs/2601.22074' },
+      { label: 'Code', href: 'https://github.com/mujocolab/mjlab' },
+    ],
+  },
+  {
+    name: 'Unitree G1',
+    action: 'Execute on hardware',
+    links: [{ label: 'Code', href: 'https://github.com/sesteban951/deploy_robot' }],
+  },
+];
+
+const models = [
+  ['G1', 'Humanoid'],
+  ['H2', 'Humanoid'],
+  ['Go2', 'Quadruped'],
+  ['Z1', 'Manipulator'],
+];
+
+const relatedResearch = [
+  ['Shooting for Contact', 'https://arxiv.org/abs/2608.03116'],
+  ['mjlab', 'https://arxiv.org/abs/2601.22074'],
+  ['BeyondMimic', 'https://arxiv.org/abs/2508.08241'],
+];
+
+function Brand() {
+  return (
+    <a className="brand" href="#top" aria-label="GhostGUI home">
+      <img src={logoUrl} alt="" width="44" height="44" />
+      <span>GhostGUI</span>
+    </a>
+  );
+}
+
+function OutboundLink({ href, children, className = '' }) {
+  return (
+    <a className={className} href={href} target="_blank" rel="noreferrer">
+      {children}
+      <ArrowUpRight aria-hidden="true" />
+    </a>
+  );
+}
+
+function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <header className="site-header">
+      <div className="header-inner">
+        <Brand />
+        <nav className={menuOpen ? 'site-nav is-open' : 'site-nav'} aria-label="Primary navigation">
+          {navItems.map(([label, href]) => (
+            <a key={label} href={href} onClick={() => setMenuOpen(false)}>
+              {label}
+            </a>
+          ))}
+        </nav>
+        <OutboundLink href={GITHUB_URL} className="github-link">
+          GitHub
+        </OutboundLink>
+        <button
+          className="menu-button"
+          type="button"
+          aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="hero page-shell" id="top">
+      <div className="hero-copy">
+        <h1>Motion,<br /><span>by design.</span></h1>
+        <p>
+          Create and edit kinematic reference motion with 3D manipulation, preview paths,
+          keyframe timelines, and export into robotics learning pipelines.
+        </p>
+        <div className="hero-actions">
+          <OutboundLink href={GITHUB_URL} className="button button-primary">
+            View on GitHub
+          </OutboundLink>
+          <a className="button button-secondary" href="#pipeline">
+            Explore the pipeline
+            <ArrowRight aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+      <figure className="hero-media">
+        <img
+          src={interfaceUrl}
+          alt="GhostGUI editing a Unitree G1 hand target in a 3D viewport, with target controls, inverse-kinematics weights, and a keyframe timeline."
+          width="2880"
+          height="1800"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </figure>
+    </section>
+  );
+}
+
+function FeaturesAndDemo() {
+  return (
+    <section className="dark-band" id="features">
+      <div className="page-shell features-grid">
+        <div className="features-heading">
+          <h2>Edit motion,<br />not arrays.</h2>
+        </div>
+        <figure className="keyframe-media">
+          <img
+            src={keyframesUrl}
+            alt="Keyframe preview with translucent intermediate Unitree G1 poses and the active orange pose controlled by a transform gizmo."
+            width="890"
+            height="600"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <div className="feature-list">
+          {features.map((feature, index) => (
+            <article className="feature-row" key={feature.title}>
+              <span className="feature-number">{String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <h3>{feature.title}</h3>
+                <p>{feature.copy}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="page-shell demo" id="demo">
+        <div className="demo-heading">
+          <h2>Watch a motion take shape.</h2>
+          <p className="demo-sequence" aria-label="Manipulate, then preview, commit, generate, and play back">
+            <span>Manipulate</span><ArrowRight /><span className="blue">Preview</span><ArrowRight />
+            <span className="orange">Commit</span><ArrowRight /><span>Generate</span><ArrowRight /><span>Playback</span>
+          </p>
+        </div>
+        <div className="video-frame">
+          <video
+            controls
+            playsInline
+            preload="metadata"
+            poster={interfaceUrl}
+            aria-label="Eighteen-second GhostGUI demonstration showing robot motion manipulation, preview, keyframe generation, and playback"
+          >
+            <source src={demoUrl} type="video/mp4" />
+            Your browser does not support embedded video.{' '}
+            <a href={demoUrl}>Download the GhostGUI demonstration</a>.
+          </video>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pipeline() {
+  return (
+    <section className="pipeline page-shell" id="pipeline">
+      <div className="section-heading">
+        <h2>From motion to hardware<span className="orange">.</span></h2>
+        <p>
+          GhostGUI authors the kinematic reference. Dynamics-aware retargeting,
+          motion-imitation learning, and deployment tooling carry it toward the physical robot.
+        </p>
+      </div>
+
+      <figure className="pipeline-figure-scroll">
+        <img
+          src={pipelineUrl}
+          alt="GhostGUI motion pipeline: create motion in GhostGUI, optimize dynamic feasibility with DSMS, train a motion-imitation tracking policy, and execute it on Unitree G1 hardware."
+          width="1983"
+          height="793"
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
+
+      <div className="pipeline-stages">
+        {pipelineStages.map((stage) => (
+          <article className="pipeline-stage" key={stage.name}>
+            <h3>{stage.name}</h3>
+            <p>{stage.action}</p>
+            <div className="stage-links">
+              {stage.links.map((link) => (
+                <OutboundLink href={link.href} key={link.label}>
+                  {link.label}
+                </OutboundLink>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Research() {
+  const flow = ['Kinematic reference', 'DSMS', 'Motion-imitation RL', 'Policy tracking performance'];
+
+  return (
+    <section className="research page-shell" id="research">
+      <h2>How does reference quality propagate through the humanoid motion pipeline<span className="orange">?</span></h2>
+      <div className="research-detail">
+        <p>
+          GhostGUI was developed as part of research examining how keyframe density,
+          feasibility, and smoothness affect dynamics-aware retargeting and downstream
+          motion-imitation learning.
+        </p>
+        <ol className="research-flow">
+          {flow.map((item) => <li key={item}>{item}</li>)}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function Models() {
+  return (
+    <section className="models page-shell" aria-labelledby="models-heading">
+      <div className="models-heading">
+        <h2 id="models-heading">Multi-robot and extensible.</h2>
+        <p>Import additional MuJoCo XML and URDF models.</p>
+      </div>
+      <div className="model-rail">
+        {models.map(([name, type]) => (
+          <article key={name}>
+            <strong>{name}</strong>
+            <span>{type}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Install() {
+  return (
+    <section className="install" id="install">
+      <div className="page-shell install-grid">
+        <div className="install-copy">
+          <h2>Get GhostGUI.</h2>
+          <p>
+            Linux / Ubuntu — primary<br />
+            macOS and Windows — experimental
+          </p>
+          <div className="install-actions">
+            <OutboundLink href={INSTALL_URL} className="button button-light">
+              <BookOpen aria-hidden="true" />
+              Installation guide
+            </OutboundLink>
+            <OutboundLink href={GITHUB_URL} className="button button-on-blue">
+              View on GitHub
+            </OutboundLink>
+          </div>
+        </div>
+        <div className="terminal" aria-label="GhostGUI installation commands">
+          <code><span>git clone</span> https://github.com/yx-lim/ghostgui.git</code>
+          <code><span>cd</span> ghostgui</code>
+          <code><span>bash</span> scripts/install_linux.sh</code>
+          <code><span>bash</span> scripts/run_linux.sh</code>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RelatedAndCredits() {
+  return (
+    <section className="related page-shell">
+      <div>
+        <h2>Related research</h2>
+        <div className="related-links">
+          {relatedResearch.map(([label, href]) => (
+            <OutboundLink href={href} key={label}>{label}</OutboundLink>
+          ))}
+        </div>
+      </div>
+      <div className="credits">
+        <h2>Credits</h2>
+        <p>GhostGUI was developed during research in the <strong>AMBER Lab at Caltech.</strong></p>
+        <p className="mentorship">Research mentorship — Aaron D. Ames · Sergio A. Esteban · Junheng Li</p>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="page-shell footer-inner">
+        <div>
+          <Brand />
+          <p>Interactive motion authoring for robots.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <OutboundLink href={GITHUB_URL}>GitHub repository</OutboundLink>
+          <OutboundLink href={DOCS_URL}>Documentation</OutboundLink>
+        </nav>
+        <small>© 2026 GhostGUI</small>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <Header />
+      <main>
+        <Hero />
+        <FeaturesAndDemo />
+        <Pipeline />
+        <Research />
+        <Models />
+        <Install />
+        <RelatedAndCredits />
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+createRoot(document.getElementById('root')).render(<App />);
