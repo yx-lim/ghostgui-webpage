@@ -16,6 +16,7 @@ import demoUrl from '../assets/hand-motion-design.mp4';
 const GITHUB_URL = 'https://github.com/yx-lim/ghostgui';
 const DOCS_URL = `${GITHUB_URL}/blob/main/docs/README.md`;
 const INSTALL_URL = `${GITHUB_URL}/blob/main/docs/install.md`;
+const CANVA_EMBED_URL = 'https://www.canva.com/design/DAHR2wPD1Co/M3J_K7CjCOn2m_xnnVEQhQ/view?embed';
 
 const navItems = [
   ['Features', '#features'],
@@ -261,6 +262,15 @@ function Pipeline() {
           </article>
         ))}
       </div>
+
+      <figure className="canva-embed">
+        <iframe
+          src={CANVA_EMBED_URL}
+          title="GhostGUI motion pipeline presentation"
+          loading="lazy"
+          allowFullScreen
+        />
+      </figure>
     </section>
   );
 }
