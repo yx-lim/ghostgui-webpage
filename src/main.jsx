@@ -262,15 +262,6 @@ function Pipeline() {
           </article>
         ))}
       </div>
-
-      <figure className="canva-embed">
-        <iframe
-          src={CANVA_EMBED_URL}
-          title="GhostGUI motion pipeline presentation"
-          loading="lazy"
-          allowFullScreen
-        />
-      </figure>
     </section>
   );
 }
@@ -291,6 +282,15 @@ function Research() {
           {flow.map((item) => <li key={item}>{item}</li>)}
         </ol>
       </div>
+
+      <figure className="canva-embed">
+        <iframe
+          src={CANVA_EMBED_URL}
+          title="GhostGUI motion pipeline presentation"
+          loading="lazy"
+          allowFullScreen
+        />
+      </figure>
     </section>
   );
 }
